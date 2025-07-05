@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">NotesOfWisdom</string>
+    <string name="title_activity_new_note">NewNoteActivity</string>
+</resources>
