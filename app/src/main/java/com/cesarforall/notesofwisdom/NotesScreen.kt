@@ -1,21 +1,11 @@
 package com.cesarforall.notesofwisdom
 
-import android.content.Context
-import android.content.Intent
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -30,18 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cesarforall.notesofwisdom.data.Note
-import com.cesarforall.notesofwisdom.data.sourceTypes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,8 +109,8 @@ fun NotesApp(
     ) { innerPadding ->
 
         val sampleNotes = listOf(
-            Note("No todos los que vagan están perdidos", "Aragorn", sourceTypes.get(1),"ESDLA", "1"),
-            Note("Todos los caminos llegan a Roma", "César", sourceTypes.get(0), "ESDLA", "10")
+            Note(1, "No todos los que vagan están perdidos", "Aragorn", null,"ESDLA", "1"),
+            Note(2, "Todos los caminos llegan a Roma", "César", null, "ESDLA", "10")
         )
 
         NavHost(
@@ -138,10 +123,7 @@ fun NotesApp(
             }
 
             composable(route = NotesScreen.Form.name) {
-                val note = Note()
-                NoteFormScreen(
-                    note = note
-                )
+                NoteFormScreen(null)
             }
         }
     }

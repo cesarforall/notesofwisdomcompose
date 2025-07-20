@@ -72,11 +72,16 @@ fun NoteCard(note: Note, onEditClick: () -> Unit) {
                 append(note.author)
                 append(", ")
                 append("\"${note.source}\"")
-                append(" (${note.sourceType?.name})")
-                when (note.sourceType?.location) {
-                    "page" -> append(", p. ${note.reference}")
-                    "minute" -> append(", min. ${note.reference}")
-                    else -> append(", ${note.reference}")
+
+                val type = sourceTypes.find { it.id == note.sourceTypeId } ?: sourceTypes[0]
+                append(" (${type.name})")
+
+                val reference = note.reference
+
+                when (type.location) {
+                    "page" -> append(", p. $reference")
+                    "minute" -> append(", min. $reference")
+                    else -> append(", $reference")
                 }
             }
 
@@ -102,8 +107,8 @@ fun NoteCard(note: Note, onEditClick: () -> Unit) {
 @Composable
 fun PreviewHomeScreen() {
     val sampleNotes = listOf(
-        Note("No todos los que vagan están perdidos", "Aragorn", sourceTypes.get(1),"ESDLA", "1"),
-        Note("Todos los caminos llegan a Roma", "César", sourceTypes.get(0), "ESDLA", "10")
+        Note(1, "No todos los que vagan están perdidos", "Aragorn", 1,"ESDLA", "1"),
+        Note(2, "Todos los caminos llegan a Roma", "César", 0, "ESDLA", "10")
     )
     HomeScreen(notes = sampleNotes)
 }
