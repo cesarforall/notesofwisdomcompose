@@ -1,5 +1,6 @@
-package com.cesarforall.notesofwisdom
+package com.cesarforall.notesofwisdom.ui.note
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -23,32 +24,38 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cesarforall.notesofwisdom.data.Note
 import com.cesarforall.notesofwisdom.data.SourceType
 import com.cesarforall.notesofwisdom.data.sourceTypes
+import com.cesarforall.notesofwisdom.ui.AppViewModelProvider
 import com.cesarforall.notesofwisdom.ui.theme.NotesOfWisdomTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun NoteFormScreen(
-    note: Note?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    noteFormViewModel: NoteFormViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    var text by rememberSaveable() { mutableStateOf(note?.text?: "") }
-    var author by rememberSaveable() { mutableStateOf(note?.author?: "") }
-    var sourceTypeId by rememberSaveable { mutableIntStateOf(note?.sourceTypeId?: 0) }
-    var source by rememberSaveable() { mutableStateOf(note?.source?: "") }
-    var reference by rememberSaveable { mutableStateOf(note?.reference?: "") }
+    val coroutineScope = rememberCoroutineScope()
+
+    val noteUiState = noteFormViewModel.noteUiState
+
+    var selectedType by remember { mutableStateOf<SourceType?>(null) }
+    LaunchedEffect(noteUiState.sourceTypeId) {
+        selectedType = sourceTypes.find { it.id == noteUiState.sourceTypeId }
+    }
 
     Card(
         elevation = CardDefaults.cardElevation(2.dp),
@@ -57,8 +64,7 @@ fun NoteFormScreen(
         modifier = modifier.fillMaxWidth().padding(16.dp)
     ) {
         val scrollState = rememberScrollState()
-        var selectedType by remember { mutableStateOf<SourceType?>(null) }
-        val isEnabled = sourceTypeId != 0
+        val isEnabled = noteUiState.sourceTypeId != null && noteUiState.sourceTypeId != 0
         val lightestGray = Color(0xFFF0F0F0)
 
         Column(
@@ -68,8 +74,8 @@ fun NoteFormScreen(
                 .padding(16.dp))
         {
             TextField(
-                value = text,
-                onValueChange = { text = it },
+                value = noteUiState.text,
+                onValueChange = { noteFormViewModel.updateNote(noteUiState.copy(text = it)) },
                 label = { Text("Text or phrase") },
                 minLines = 5,
                 maxLines = 5,
@@ -80,8 +86,8 @@ fun NoteFormScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             TextField(
-                value = author,
-                onValueChange = { author = it },
+                value = noteUiState.author,
+                onValueChange = { noteFormViewModel.updateNote(noteUiState.copy(author = it)) },
                 label = { Text("Author") },
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
@@ -94,12 +100,12 @@ fun NoteFormScreen(
                 selected = selectedType,
                 onSelected = {
                     selectedType = it
-                    sourceTypeId = it.id
+                    noteFormViewModel.updateNote(noteUiState.copy(sourceTypeId = it.id))
                 }
             )
             TextField(
-                value = source,
-                onValueChange = { source = it },
+                value = noteUiState.source,
+                onValueChange = { noteFormViewModel.updateNote(noteUiState.copy(source = it)) },
                 label = { Text("Source") },
                 enabled = isEnabled,
                 colors = TextFieldDefaults.colors(
@@ -112,8 +118,8 @@ fun NoteFormScreen(
                 modifier = modifier.fillMaxWidth()
             )
             TextField(
-                value = reference,
-                onValueChange = { reference = it },
+                value = noteUiState.reference,
+                onValueChange = { noteFormViewModel.updateNote(noteUiState.copy(reference = it)) },
                 enabled = isEnabled,
                 label = { Text(
                     when (selectedType?.location) {
@@ -135,9 +141,14 @@ fun NoteFormScreen(
             Spacer(Modifier.size(24.dp))
 
             Button(
-                onClick = {},
+                onClick = {
+                    coroutineScope.launch {
+                        noteFormViewModel.saveNote()
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
+                    containerColor = Color.White,
+                    contentColor = Color.Black
                 ),
                 border = BorderStroke(1.dp, Color.Black),
                 shape = RectangleShape,
@@ -200,12 +211,13 @@ fun SourceTypeDropdown(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun PreviewNoteFormScreen() {
     val note = Note(1, "Nota de prueba", "César", null, "", "")
 
     NotesOfWisdomTheme {
-        NoteFormScreen(note = note, modifier = Modifier)
+        NoteFormScreen()
     }
 }

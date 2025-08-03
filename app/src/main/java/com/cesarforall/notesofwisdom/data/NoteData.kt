@@ -21,7 +21,8 @@ data class SourceType(
 
 @Entity
 data class Note(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     val text: String = "",
     val author: String = "",
     val sourceTypeId: Int?,

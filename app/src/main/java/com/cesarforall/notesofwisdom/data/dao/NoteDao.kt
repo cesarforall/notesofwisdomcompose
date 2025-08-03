@@ -1,22 +1,23 @@
-package com.cesarforall.notesofwisdom.dao
+package com.cesarforall.notesofwisdom.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.cesarforall.notesofwisdom.data.Note
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao {
     @Query("SELECT * FROM note")
-    fun getAll(): List<Note>
+    fun getAll(): Flow<List<Note>>
 
     @Query("SELECT * FROM note WHERE id = (:id)")
-    fun getById(id: Int): Note
+    fun getById(id: Int): Flow<Note>
 
     @Insert
-    fun insert(note: Note)
+    suspend fun insert(note: Note)
 
     @Delete
-    fun delete(note: Note)
+    suspend fun delete(note: Note)
 }
