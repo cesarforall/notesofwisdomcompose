@@ -1,11 +1,17 @@
 package com.cesarforall.notesofwisdom
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -16,17 +22,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.cesarforall.notesofwisdom.data.Note
 import com.cesarforall.notesofwisdom.ui.home.HomeScreen
 import com.cesarforall.notesofwisdom.ui.noteForm.NoteFormScreen
 
@@ -63,30 +70,82 @@ fun NotesTopAppBar() {
 }
 
 @Composable
-fun NotesBottomAppBar() {
+fun NotesBottomAppBar(
+    leftButtonText: String = "",
+    rightButtonText: String = "",
+    onLeftButtonClick: () -> Unit,
+    onRightButtonClick: () -> Unit
+) {
     BottomAppBar(
+        modifier = Modifier.padding(16.dp),
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.primary,
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            text = "",
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (leftButtonText != "") {
+                LeftButton(
+                    onClick = onLeftButtonClick,
+                    text = "",
+                    modifier = Modifier.weight(1F)
+                )
+            } else {
+                Spacer(Modifier.weight(1F))
+            }
+            Spacer(Modifier.size(8.dp))
+            if (rightButtonText != "") {
+                RightButton(
+                    onClick = onRightButtonClick,
+                    text = rightButtonText,
+                    modifier = Modifier.weight(1F)
+                )
+            } else {
+                Spacer(Modifier.weight(1F))
+            }
+        }
     }
 }
 
 @Composable
-fun NewNoteButton(
-    onClick: () -> Unit
+fun LeftButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    IconButton(onClick = onClick) {
-        Icon(
-            painter = painterResource(id = R.drawable.ink_pen_48dp),
-            contentDescription = "Añadir nota",
-            tint = Color.Black
-        )
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White,
+            contentColor = Color.Black
+        ),
+        border = BorderStroke(1.dp, Color.Black),
+        shape = RectangleShape,
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Text(text, color = Color.Black)
+    }
+}
+
+@Composable
+fun RightButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White,
+            contentColor = Color.Black
+        ),
+        border = BorderStroke(1.dp, Color.Black),
+        shape = RectangleShape,
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Text(text, color = Color.Black)
     }
 }
 
@@ -99,22 +158,34 @@ enum class NotesScreen {
 fun NotesApp(
     navController: NavHostController = rememberNavController()
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     Scaffold(
         topBar = { NotesTopAppBar() },
-        bottomBar = { NotesBottomAppBar() },
-        floatingActionButton = {
-            NewNoteButton(onClick = {
-                navController.navigate(NotesScreen.Form.name)
-            })
+        bottomBar = {
+            when (currentRoute) {
+                NotesScreen.Start.name -> {
+                    NotesBottomAppBar(
+                        leftButtonText = "",
+                        rightButtonText = "New Note",
+                        onLeftButtonClick = {  },
+                        onRightButtonClick = { navController.navigate(NotesScreen.Form.name) }
+                    )
+                }
+                NotesScreen.Form.name -> {
+                    NotesBottomAppBar(
+                        leftButtonText = "",
+                        rightButtonText = "Back",
+                        onLeftButtonClick = {  },
+                        onRightButtonClick = { navController.navigate(NotesScreen.Start.name) }
+                    )
+                }
+                else -> Text("Hello")
+            }
         },
         modifier = Modifier.padding()
     ) { innerPadding ->
-
-        val sampleNotes = listOf(
-            Note(1, "No todos los que vagan están perdidos", "Aragorn", null,"ESDLA", "1"),
-            Note(2, "Todos los caminos llegan a Roma", "César", null, "ESDLA", "10")
-        )
-
         NavHost(
             navController = navController,
             startDestination = NotesScreen.Start.name,
