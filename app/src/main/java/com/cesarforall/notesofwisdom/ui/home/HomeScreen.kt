@@ -8,11 +8,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,7 +32,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cesarforall.notesofwisdom.data.Note
 import com.cesarforall.notesofwisdom.data.sourceTypes
 import com.cesarforall.notesofwisdom.ui.AppViewModelProvider
-import androidx.compose.runtime.getValue
 
 
 @Composable
@@ -67,45 +73,74 @@ fun NoteCard(note: Note, onEditClick: () -> Unit) {
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = note.text,
-                fontSize = TextUnit.Unspecified,
-                fontFamily = FontFamily.Serif,
-                color = Color.Black
-            )
-
-            val citation = buildString {
-                append("— ")
-                append(note.author)
-                append(", ")
-                append("\"${note.source}\"")
-
-                val type = sourceTypes.find { it.id == note.sourceTypeId } ?: sourceTypes[0]
-                append(" (${type.name})")
-
-                val reference = note.reference
-
-                when (type.location) {
-                    "page" -> append(", p. $reference")
-                    "minute" -> append(", min. $reference")
-                    else -> append(", $reference")
-                }
-            }
-
-            Row(
+        Row {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .weight(1f)
+                    .padding(16.dp)
             ) {
                 Text(
-                    text = citation,
-                    fontStyle = FontStyle.Italic,
+                    text = note.text,
                     fontSize = TextUnit.Unspecified,
-                    color = Color.DarkGray
+                    fontFamily = FontFamily.Serif,
+                    color = Color.Black
                 )
+
+                val citation = buildString {
+                    append("— ")
+                    append(note.author)
+                    append(", ")
+                    append("\"${note.source}\"")
+
+                    val type = sourceTypes.find { it.id == note.sourceTypeId } ?: sourceTypes[0]
+                    append(" (${type.name})")
+
+                    val reference = note.reference
+
+                    when (type.location) {
+                        "page" -> append(", p. $reference")
+                        "minute" -> append(", min. $reference")
+                        else -> append(", $reference")
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = citation,
+                        fontStyle = FontStyle.Italic,
+                        fontSize = TextUnit.Unspecified,
+                        color = Color.DarkGray
+                    )
+                }
+            }
+            Column {
+                IconButton(onClick = {  }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = "Edit note",
+                        tint = Color.Black
+                    )
+                }
+                IconButton(onClick = {  }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Share,
+                        contentDescription = "Add note",
+                        tint = Color.Black
+                    )
+                }
+                IconButton(onClick = {  }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = "Delete note",
+                        tint = Color.Black
+                    )
+                }
             }
         }
     }
@@ -113,10 +148,10 @@ fun NoteCard(note: Note, onEditClick: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewHomeScreen() {
+fun PreviewNotesList() {
     val sampleNotes = listOf(
-        Note(1, "No todos los que vagan están perdidos", "Aragorn", 1,"ESDLA", "1"),
+        Note(1, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia rutrum felis. Mauris consectetur, sapien vel suscipit finibus, mauris ipsum malesuada massa, quis aliquam massa urna a magna. Fusce turpis odio, auctor id scelerisque id, feugiat ac leo. Pellentesque pretium nulla id vestibulum ornare. Quisque sollicitudin consequat convallis. Morbi consectetur id odio lacinia suscipit. Donec vulputate leo eu commodo volutpat. Nam nec imperdiet erat.", "Aragorn", 1,"ESDLA", "1"),
         Note(2, "Todos los caminos llegan a Roma", "César", 0, "ESDLA", "10")
     )
-    HomeScreen()
+    NotesList(sampleNotes)
 }
