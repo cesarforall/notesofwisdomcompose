@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class HomeViewModel(notesRepository: NotesRepository) : ViewModel() {
+class HomeViewModel(private val notesRepository: NotesRepository) : ViewModel() {
     val homeUiState: StateFlow<HomeUiState> =
         notesRepository.gellAllNotesStream().map { HomeUiState(it) }
             .stateIn(
@@ -17,6 +18,12 @@ class HomeViewModel(notesRepository: NotesRepository) : ViewModel() {
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = HomeUiState()
             )
+
+    fun deleteNote(note: Note) {
+        viewModelScope.launch {
+            notesRepository.deleteNote(note)
+        }
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

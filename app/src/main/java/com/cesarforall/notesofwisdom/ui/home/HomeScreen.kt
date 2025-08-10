@@ -44,12 +44,17 @@ fun HomeScreen(
 
     NotesList(
         notes = notes,
+        onDeleteClick = { note -> homeViewModel.deleteNote(note) },
         modifier = modifier
     )
 }
 
 @Composable
-fun NotesList(notes: List<Note>, modifier: Modifier = Modifier) {
+fun NotesList(
+    notes: List<Note>,
+    onDeleteClick: (Note) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -57,14 +62,21 @@ fun NotesList(notes: List<Note>, modifier: Modifier = Modifier) {
         items(notes) { note ->
             NoteCard(
                 note,
-                onEditClick = { /* ... */ }
+                onEditClick = { /* ... */ },
+                onShareClick = {  },
+                onDeleteClick = { onDeleteClick(note) }
             )
         }
     }
 }
 
 @Composable
-fun NoteCard(note: Note, onEditClick: () -> Unit) {
+fun NoteCard(
+    note: Note,
+    onEditClick: () -> Unit,
+    onShareClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -134,7 +146,7 @@ fun NoteCard(note: Note, onEditClick: () -> Unit) {
                         tint = Color.Black
                     )
                 }
-                IconButton(onClick = {  }) {
+                IconButton(onClick = onDeleteClick) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
                         contentDescription = "Delete note",
@@ -153,5 +165,5 @@ fun PreviewNotesList() {
         Note(1, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia rutrum felis. Mauris consectetur, sapien vel suscipit finibus, mauris ipsum malesuada massa, quis aliquam massa urna a magna. Fusce turpis odio, auctor id scelerisque id, feugiat ac leo. Pellentesque pretium nulla id vestibulum ornare. Quisque sollicitudin consequat convallis. Morbi consectetur id odio lacinia suscipit. Donec vulputate leo eu commodo volutpat. Nam nec imperdiet erat.", "Aragorn", 1,"ESDLA", "1"),
         Note(2, "Todos los caminos llegan a Roma", "César", 0, "ESDLA", "10")
     )
-    NotesList(sampleNotes)
+    NotesList(sampleNotes, onDeleteClick = {})
 }
