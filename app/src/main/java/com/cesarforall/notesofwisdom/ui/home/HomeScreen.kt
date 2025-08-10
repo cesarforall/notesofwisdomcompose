@@ -1,5 +1,6 @@
 package com.cesarforall.notesofwisdom.ui.home
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -86,6 +88,7 @@ fun NoteCard(
     onShareClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
+    val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
 
     if (showDialog) {
@@ -145,25 +148,6 @@ fun NoteCard(
                     fontFamily = FontFamily.Serif,
                     color = Color.Black
                 )
-
-                val citation = buildString {
-                    append("— ")
-                    append(note.author)
-                    append(", ")
-                    append("\"${note.source}\"")
-
-                    val type = sourceTypes.find { it.id == note.sourceTypeId } ?: sourceTypes[0]
-                    append(" (${type.name})")
-
-                    val reference = note.reference
-
-                    when (type.location) {
-                        "page" -> append(", p. $reference")
-                        "minute" -> append(", min. $reference")
-                        else -> append(", $reference")
-                    }
-                }
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -172,7 +156,7 @@ fun NoteCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = citation,
+                        text = buildCitation(note),
                         fontStyle = FontStyle.Italic,
                         fontSize = TextUnit.Unspecified,
                         color = Color.DarkGray
@@ -187,7 +171,22 @@ fun NoteCard(
                         tint = Color.Black
                     )
                 }
-                IconButton(onClick = {  }) {
+                IconButton(
+                    onClick = {
+                        val noteWithCitation = if (buildCitation(note).isNotBlank()) {
+                            note.text + "\n" + buildCitation(note)
+                        } else {
+                            note.text
+                        }
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, noteWithCitation)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.Outlined.Share,
                         contentDescription = "Add note",
@@ -201,6 +200,37 @@ fun NoteCard(
                         tint = Color.Black
                     )
                 }
+            }
+        }
+    }
+}
+
+fun buildCitation(note: Note) : String {
+    return buildString {
+        if (note.author.isNotBlank()) {
+            append("— ")
+            append(note.author)
+        }
+
+        if (note.source.isNotBlank()) {
+            append(", \"${note.source}\"")
+
+            val type = sourceTypes.find { it.id == note.sourceTypeId } ?: sourceTypes[0]
+
+            if (type != sourceTypes[0]) {
+                append(" (${type.name})")
+
+                val reference = note.reference
+
+                if (reference.isNotBlank()) {
+                    when (type.location) {
+                        "page" -> append(", p. $reference")
+                        "minute" -> append(", min. $reference")
+                        else -> append(", $reference")
+                    }
+                }
+            } else {
+                append(" (${type.name})")
             }
         }
     }
