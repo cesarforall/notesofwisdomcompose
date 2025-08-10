@@ -1,4 +1,4 @@
-package com.cesarforall.notesofwisdom.ui.note
+package com.cesarforall.notesofwisdom.ui.noteForm
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.cesarforall.notesofwisdom.NotesApplication
 import com.cesarforall.notesofwisdom.ui.home.HomeViewModel
-import com.cesarforall.notesofwisdom.ui.note.NoteFormViewModel
+import com.cesarforall.notesofwisdom.ui.noteForm.NoteFormViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {

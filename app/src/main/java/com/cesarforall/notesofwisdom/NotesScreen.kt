@@ -28,7 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cesarforall.notesofwisdom.data.Note
 import com.cesarforall.notesofwisdom.ui.home.HomeScreen
-import com.cesarforall.notesofwisdom.ui.note.NoteFormScreen
+import com.cesarforall.notesofwisdom.ui.noteForm.NoteFormScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

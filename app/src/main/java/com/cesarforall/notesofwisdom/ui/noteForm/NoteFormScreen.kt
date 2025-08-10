@@ -1,8 +1,9 @@
-package com.cesarforall.notesofwisdom.ui.note
+package com.cesarforall.notesofwisdom.ui.noteForm
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -68,6 +71,7 @@ fun NoteFormScreen(
         val lightestGray = Color(0xFFF0F0F0)
 
         Column(
+            verticalArrangement = Arrangement.Center,
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
@@ -89,10 +93,12 @@ fun NoteFormScreen(
                 value = noteUiState.author,
                 onValueChange = { noteFormViewModel.updateNote(noteUiState.copy(author = it)) },
                 label = { Text("Author") },
+                maxLines = 1,
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
                     focusedContainerColor = Color.White
                 ),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 modifier = modifier.fillMaxWidth()
             )
             SourceTypeDropdown(
@@ -108,6 +114,7 @@ fun NoteFormScreen(
                 onValueChange = { noteFormViewModel.updateNote(noteUiState.copy(source = it)) },
                 label = { Text("Source") },
                 enabled = isEnabled,
+                maxLines = 1,
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = if (isEnabled) Color.White else Color.LightGray,
                     focusedContainerColor = if (isEnabled) Color.White else Color.LightGray,
@@ -115,6 +122,7 @@ fun NoteFormScreen(
                     disabledTextColor = Color.DarkGray,
                     disabledLabelColor = Color.Gray
                 ),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 modifier = modifier.fillMaxWidth()
             )
             TextField(
@@ -128,6 +136,7 @@ fun NoteFormScreen(
                         else -> "Unknown"
                     }
                 ) },
+                maxLines = 1,
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
                     focusedContainerColor = Color.White,
@@ -135,10 +144,11 @@ fun NoteFormScreen(
                     disabledTextColor = Color.DarkGray,
                     disabledLabelColor = Color.Gray
                 ),
-                modifier = modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
             )
 
-            Spacer(Modifier.size(24.dp))
+            Spacer(Modifier.size(56.dp))
 
             Button(
                 onClick = {
