@@ -49,11 +49,20 @@ import kotlinx.coroutines.launch
 @Composable
 fun NoteFormScreen(
     modifier: Modifier = Modifier,
+    noteId: Int? = null,
     noteFormViewModel: NoteFormViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
 
     val noteUiState = noteFormViewModel.noteUiState
+
+    LaunchedEffect(noteId) {
+        if (noteId != null) {
+            noteFormViewModel.loadNote(noteId)
+        } else {
+            noteFormViewModel.clearForm()
+        }
+    }
 
     var selectedType by remember { mutableStateOf<SourceType?>(null) }
     LaunchedEffect(noteUiState.sourceTypeId) {
@@ -153,7 +162,11 @@ fun NoteFormScreen(
             Button(
                 onClick = {
                     coroutineScope.launch {
-                        noteFormViewModel.saveNote()
+                        if (noteId != null) {
+                            noteFormViewModel.modifyNote()
+                        } else {
+                            noteFormViewModel.saveNote()
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(

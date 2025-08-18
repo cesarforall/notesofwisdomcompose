@@ -30,10 +30,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.cesarforall.notesofwisdom.ui.home.HomeScreen
 import com.cesarforall.notesofwisdom.ui.noteForm.NoteFormScreen
 
@@ -164,8 +166,8 @@ fun NotesApp(
     Scaffold(
         topBar = { NotesTopAppBar() },
         bottomBar = {
-            when (currentRoute) {
-                NotesScreen.Start.name -> {
+            when {
+                currentRoute?.startsWith(NotesScreen.Start.name) == true -> {
                     NotesBottomAppBar(
                         leftButtonText = "",
                         rightButtonText = "New Note",
@@ -173,7 +175,7 @@ fun NotesApp(
                         onRightButtonClick = { navController.navigate(NotesScreen.Form.name) }
                     )
                 }
-                NotesScreen.Form.name -> {
+                currentRoute?.startsWith(NotesScreen.Form.name) == true -> {
                     NotesBottomAppBar(
                         leftButtonText = "",
                         rightButtonText = "Back",
@@ -192,11 +194,23 @@ fun NotesApp(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = NotesScreen.Start.name) {
-                HomeScreen()
+                HomeScreen(navController = navController)
             }
 
             composable(route = NotesScreen.Form.name) {
                 NoteFormScreen()
+            }
+
+            composable(
+                route = "${NotesScreen.Form.name}?noteId={noteId}",
+                arguments = listOf(navArgument("noteId") {
+                    type = NavType.StringType
+                    defaultValue = null
+                    nullable = true
+                })
+            ) { backStackEntry ->
+                val noteId = backStackEntry.arguments?.getString("noteId")?.toIntOrNull()
+                NoteFormScreen(noteId = noteId)
             }
         }
     }

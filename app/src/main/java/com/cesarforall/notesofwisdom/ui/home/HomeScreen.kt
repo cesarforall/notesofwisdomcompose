@@ -39,15 +39,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.cesarforall.notesofwisdom.NotesScreen
 import com.cesarforall.notesofwisdom.data.Note
 import com.cesarforall.notesofwisdom.data.sourceTypes
 import com.cesarforall.notesofwisdom.ui.AppViewModelProvider
 
-
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    homeViewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    navController: NavController
 ) {
     val homeUiState by homeViewModel.homeUiState.collectAsState()
     val notes = homeUiState.notesList
@@ -55,6 +57,9 @@ fun HomeScreen(
     NotesList(
         notes = notes,
         onDeleteClick = { note -> homeViewModel.deleteNote(note) },
+        onEditClick = { note ->
+            navController.navigate("${NotesScreen.Form.name}?noteId=${note.id}")
+        },
         modifier = modifier
     )
 }
@@ -63,6 +68,7 @@ fun HomeScreen(
 fun NotesList(
     notes: List<Note>,
     onDeleteClick: (Note) -> Unit,
+    onEditClick: (Note) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -72,7 +78,7 @@ fun NotesList(
         items(notes) { note ->
             NoteCard(
                 note,
-                onEditClick = { /* ... */ },
+                onEditClick = { onEditClick(note) },
                 onShareClick = {  },
                 onDeleteClick = { onDeleteClick(note) }
             )
@@ -164,7 +170,7 @@ fun NoteCard(
                 }
             }
             Column {
-                IconButton(onClick = {  }) {
+                IconButton(onClick = onEditClick) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
                         contentDescription = "Edit note",
@@ -243,5 +249,9 @@ fun PreviewNotesList() {
         Note(1, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia rutrum felis. Mauris consectetur, sapien vel suscipit finibus, mauris ipsum malesuada massa, quis aliquam massa urna a magna. Fusce turpis odio, auctor id scelerisque id, feugiat ac leo. Pellentesque pretium nulla id vestibulum ornare. Quisque sollicitudin consequat convallis. Morbi consectetur id odio lacinia suscipit. Donec vulputate leo eu commodo volutpat. Nam nec imperdiet erat.", "Aragorn", 1,"ESDLA", "1"),
         Note(2, "Todos los caminos llegan a Roma", "César", 0, "ESDLA", "10")
     )
-    NotesList(sampleNotes, onDeleteClick = {})
+    NotesList(
+        sampleNotes,
+        onDeleteClick = {},
+        onEditClick = {}
+    )
 }
